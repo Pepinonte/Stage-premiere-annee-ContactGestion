@@ -2,12 +2,20 @@
 #include <iostream>
 #include <QtSql>
 #include <QDebug>
+#include <Windows.h> // Pour GetConsoleOutputCP et SetConsoleOutputCP (affichage des accents dans la console)
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
+
+    // Pour affichage correct des accents dans la console
+    uint temp = GetConsoleOutputCP(); // Sauvegarde du réglage par défaut
+    SetConsoleOutputCP(CP_UTF8); // Modification du réglage
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QTextCodec::setCodecForLocale(codec);
+
     //***********************************************************************************************************
     //*****************************************Recuperation BDD**************************************************
     //***********************************************************************************************************
@@ -17,54 +25,70 @@ int main(int argc, char *argv[])
      db = QSqlDatabase::addDatabase("QMYSQL");
 
      // Définition des paramètres de connexion à la base de données
-     db.setHostName("localhost"); // @ip serveur MySQL
-     db.setDatabaseName("gestion_des_notes_cg"); // Nom de la base
+     db.setHostName("localhost"); // ip serveur MySQL
+     db.setDatabaseName("contact"); // Nom de la base
      db.setUserName("root"); // Nom utilisateur
      db.setPassword(""); // Mot de passe
 
      if(db.open()) {
-     qDebug() << "Ok - ouverture de la base de donnée";
 
-     // Exécution d'une requête
-     QSqlQuery requete;
-     if(requete.exec("SELECT * FROM Meteo")) {
-     qDebug() << "Ok - requete";
+         qDebug() << "Ok - ouverture de la base de donnée";
 
-     // Boucle qui permet de parcourir les enregistrements renvoyés par la requête
-     while(requete.next()) {
-     // On accède ici aux différents champs par leurs noms, il est également possible
-     // d'y accéder par leur index : requete.value(0)
-     qDebug() << requete.value("Date") << " " << requete.value("Temp1") << " "
-     << requete.value("Temp2") << " " << requete.value("Pression")
-     << requete.value("Humidite ");
+         // Exécution d'une requête
+         QSqlQuery requete;
+
+         QString sSql = "SELECT sujet "
+                        "FROM client";
+
+         if(requete.exec(sSql)) {
+
+             // Boucle qui permet de parcourir les enregistrements renvoyés par la requête
+             while(requete.next()) {
+                 // On accède ici aux différents champs par leurs noms, il est également possible
+                 // d'y accéder par leur index : requete.value(0)
+                 //***********************************************************************************************************
+                 //*****************************************Initialisation variables******************************************
+                 //***********************************************************************************************************
+                 //QTime date = requete.value("date").toTime();
+                 //QString nom = requete.value("nom").toString();
+                 //QString prenom = requete.value("prenom").toString();
+                 //QString mail = requete.value("mail").toString();
+                 //QString message = requete.value("message").toString();
+                 QString sujet = requete.value("sujet").toString();
+
+                 qDebug() << sujet ;
+             }
      }
-     }
+
      else {
-     qDebug() << "Echec de la requête";
-     // La méthode lastError permet d'afficher un message
-     // plus explicite sur les causes de l'erreur
-     qDebug() << requete.lastError();
+         qDebug() << "Echec de la requête";
+         // La méthode lastError permet d'afficher un message
+         // plus explicite sur les causes de l'erreur
+         qDebug() << requete.lastError();
      }
      db.close(); // Fermeture de la base de données
      }
+
      else {
-     qDebug() << "Echec d'ouverture de la base de donnée";
-     qDebug() << db.lastError();
+         qDebug() << "Echec d'ouverture de la base de donnée";
+         qDebug() << db.lastError();
      }
-    //***********************************************************************************************************
-    //*****************************************Initialisation variables******************************************
-    //***********************************************************************************************************
-    //QTime heure = requete.value("Heure").toTime();
-    //float temperature = requete.value("Temp2").toFloat();
-    //int humidite = requete.value("Humidite ").toInt();
-    //int nbrMsg = requete.value("nbrMsg").toInt();
 
     //***********************************************************************************************************
-    //*****************************************affichage nbr de msg**********************************************
+    //*****************************************affichage nombre de msg*******************************************
     //***********************************************************************************************************
-     cout<<"Vous avais reçu XX messages";
+
+    //***********************************************************************************************************
     //*****************************************listing des sujets************************************************
+    //***********************************************************************************************************
+
+    //***********************************************************************************************************
     //*****************************************consult stats*****************************************************
+    //***********************************************************************************************************
+
+    //***********************************************************************************************************
     //*****************************************consult msg*******************************************************
-    return a.exec();
+    //***********************************************************************************************************
+
+     return a.exec();
 }
