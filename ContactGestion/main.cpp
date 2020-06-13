@@ -17,13 +17,13 @@ int main(int argc, char *argv[])
      bdd.connexion();
 
      int choix =0;
+
      cout << "1-        LISTE DE SUJETS " << endl;
      cout << "2-        LISTE DE MESSAGES " << endl;
      cout << "3-        NOMBRE DE MESSAGES " << endl;
 
-
-
      cin >> choix;
+
      bdd.ouverture(choix);
 
      return a.exec();
